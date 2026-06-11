@@ -715,6 +715,12 @@ html, body {
   border-color: var(--blue);
 }
 
+/* ---- WINNER ---- */
+.team-name.winner {
+  color: var(--gold);
+  font-weight: 800;
+}
+
 /* ---- EMPTY RANKING ---- */
 .ranking-empty {
   display: flex;
