@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MPP Challenge · Coupe du Monde 2026</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -25,110 +25,48 @@
         <span id="liveText">EN DIRECT</span>
       </div>
       <div class="header-clock" id="clock">--:--</div>
-      <div class="header-date" id="dateDisplay">--/--/----</div>
+      <div class="header-date" id="dateDisplay">--</div>
     </div>
   </header>
 
   <!-- MAIN GRID -->
   <main class="main-grid">
 
-    <!-- COLONNE GAUCHE : Classement MPP -->
+    <!-- COLONNE GAUCHE : MPP réel en iframe -->
     <section class="panel panel-mpp">
       <div class="panel-header">
         <span class="panel-icon">👥</span>
         <span class="panel-title">Classement MPP</span>
-        <button class="admin-toggle" id="adminToggle" title="Modifier le classement">✏️</button>
+        <a class="mpp-open-link" href="https://mpp.football/leagues/mpp_challenge_UC8MVG4F" target="_blank" title="Ouvrir MPP dans un nouvel onglet">↗</a>
       </div>
-
-      <!-- Tableau classement -->
-      <div class="ranking-table" id="rankingTable">
-        <div class="ranking-header">
-          <span class="col-rank">#</span>
-          <span class="col-name">Joueur</span>
-          <span class="col-pts">Pts</span>
-          <span class="col-good">✓</span>
-          <span class="col-exact">★</span>
-        </div>
-        <div id="rankingRows">
-          <!-- Rempli par JS -->
-        </div>
-      </div>
-
-      <!-- Légende -->
-      <div class="ranking-legend">
-        <span><span class="legend-dot good"></span> Bonne issue</span>
-        <span><span class="legend-dot exact"></span> Score exact</span>
+      <div class="iframe-wrap">
+        <iframe
+          id="mppFrame"
+          src="https://mpp.football/leagues/mpp_challenge_UC8MVG4F"
+          title="Classement MPP"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+        ></iframe>
       </div>
     </section>
 
-    <!-- COLONNE DROITE : Matchs CdM -->
+    <!-- COLONNE DROITE : Matchs CdM ESPN -->
     <section class="panel panel-matches">
       <div class="panel-header">
         <span class="panel-icon">⚽</span>
         <span class="panel-title">Coupe du Monde 2026</span>
-        <div class="refresh-info" id="refreshInfo">Actualisation dans <span id="countdown">--</span>s</div>
+        <div class="refresh-info">Actu. dans <span id="countdown">60</span>s</div>
       </div>
 
-      <!-- Onglets -->
-      <div class="match-tabs">
-        <button class="tab-btn active" data-tab="recent" onclick="switchTab('recent')">Résultats récents</button>
-        <button class="tab-btn" data-tab="today" onclick="switchTab('today')">Aujourd'hui</button>
-        <button class="tab-btn" data-tab="tomorrow" onclick="switchTab('tomorrow')">Ce soir / Demain</button>
-      </div>
-
-      <div class="matches-container" id="matchesContainer">
-        <div class="loading-state">
-          <div class="spinner"></div>
-          <span>Chargement des matchs…</span>
-        </div>
-      </div>
+      <div id="matches" class="matches"></div>
     </section>
 
   </main>
 
-  <!-- PANNEAU ADMIN (caché par défaut) -->
-  <div class="admin-panel" id="adminPanel">
-    <div class="admin-header">
-      <h3>✏️ Modifier le classement MPP</h3>
-      <button class="admin-close" onclick="closeAdmin()">✕</button>
-    </div>
-    <div class="admin-body">
-      <p class="admin-hint">Entrez les joueurs dans l'ordre du classement. Laissez vide pour supprimer.</p>
-      <div id="adminRows"></div>
-      <button class="admin-add" onclick="addAdminRow()">+ Ajouter un joueur</button>
-      <div class="admin-actions">
-        <button class="btn-save" onclick="saveRanking()">💾 Enregistrer</button>
-        <button class="btn-cancel" onclick="closeAdmin()">Annuler</button>
-      </div>
-    </div>
-  </div>
-  <div class="admin-overlay" id="adminOverlay" onclick="closeAdmin()"></div>
-
-  <!-- CONFIG API -->
-  <div class="config-bar" id="configBar">
-    <span>⚙️ Clé API football non configurée.</span>
-    <a href="#" onclick="showApiConfig()">Configurer maintenant</a>
-    <button onclick="dismissConfig()" class="config-dismiss">✕</button>
-  </div>
-
-  <div class="admin-panel" id="apiConfigPanel" style="display:none">
-    <div class="admin-header">
-      <h3>⚙️ Configuration API Football</h3>
-      <button class="admin-close" onclick="document.getElementById('apiConfigPanel').style.display='none'; document.getElementById('adminOverlay').style.display='none'">✕</button>
-    </div>
-    <div class="admin-body">
-      <p class="admin-hint">
-        Pour afficher les matchs en temps réel, tu as besoin d'une clé API gratuite :<br><br>
-        1. Va sur <strong>api-football.com</strong> → <em>Dashboard</em> → créer un compte gratuit<br>
-        2. Copie ta clé API (100 requêtes/jour gratuites)<br>
-        3. Colle-la ci-dessous et enregistre
-      </p>
-      <input type="text" id="apiKeyInput" placeholder="Ta clé API (ex: abc123def456...)" class="api-key-input" />
-      <div class="admin-actions">
-        <button class="btn-save" onclick="saveApiKey()">💾 Enregistrer</button>
-      </div>
-    </div>
-  </div>
+  <!-- Footer -->
+  <footer class="footer">
+    <span id="status">Chargement…</span>
+    <span id="updatedAt">Dernière mise à jour : --</span>
+  </footer>
 
   <script src="app.js"></script>
 </body>
